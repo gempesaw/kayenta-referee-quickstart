@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  kayenta:
+    build:
+      context: .
+      dockerfile: Dockerfile.kayenta
+    image: ghcr.io/gempesaw/kayenta-referee-quickstart:kayenta
+    ports:
+      - 8090:8090
+    environment:
+      - services.redis.baseUrl=redis://redis:6379
+      - redis.connection=redis://redis:6379
+    volumes:
+      - ./kayenta.yml:/opt/kayenta/config/kayenta.yml
+    depends_on:
+      - redis
+
+  referee:
+    build:
+      context: .
+      dockerfile: Dockerfile.referee
+    image: ghcr.io/gempesaw/kayenta-referee-quickstart:referee
+    environment:
+      - KAYENTA_BASE_URL=kayenta:8090
+    ports:
+      - 3001:3001
+
+  redis:
+    image: redis:latest
